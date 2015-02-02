@@ -1,0 +1,45 @@
+------- FILE bowling.asm LEVEL 1 PASS 2
+      1  1047					      processor	6502
+      2  1000					      org	$1000
+      3  1000
+      4  1000				   add_roll
+      5  1000		       ad 44 10 	      lda	bonus
+      6  1003		       29 03		      and	#$03
+      7  1005		       aa		      tax
+      8  1006				   loop_score
+      9  1006		       20 17 10 	      jsr	add_score
+     10  1009		       ca		      dex
+     11  100a		       d0 fa		      bne	loop_score
+     12  100c		       ad 45 10 	      lda	frame
+     13  100f		       c9 10		      cmp	#$10
+     14  1011		       f0 03		      beq	end_score
+     15  1013		       20 17 10 	      jsr	add_score
+     16  1016				   end_score
+     17  1016		       60		      rts
+     18  1017				   add_score
+     19  1017		       18		      clc
+     20  1018		       ad 41 10 	      lda	roll
+     21  101b		       6d 42 10 	      adc	score
+     22  101e		       8d 42 10 	      sta	score
+     23  1021		       a9 00		      lda	#0
+     24  1023		       6d 43 10 	      adc	score+1
+     25  1026		       8d 43 10 	      sta	score+1
+     26  1029		       60		      rts
+     27  102a
+     28  102a				   start
+     29  102a		       a9 00		      lda	#0
+     30  102c		       8d 42 10 	      sta	score+0
+     31  102f		       8d 43 10 	      sta	score+1
+     32  1032		       8d 44 10 	      sta	bonus
+     33  1035		       8d 45 10 	      sta	frame
+     34  1038		       8d 41 10 	      sta	roll
+     35  103b		       a9 0b		      lda	#$0B
+     36  103d		       8d 46 10 	      sta	track
+     37  1040		       60		      rts
+     38  1041
+     39  1041		       00	   roll       .byte.b	0
+     40  1042		       00 00	   score      .word.w	0
+     41  1044		       00	   bonus      .byte.b	0
+     42  1045		       00	   frame      .byte.b	0
+     43  1046		       00	   track      .byte.b	0
+     44  1047
