@@ -1,45 +1,67 @@
 ------- FILE bowling.asm LEVEL 1 PASS 2
-      1  1047					      processor	6502
+      1  106f					      processor	6502
       2  1000					      org	$1000
       3  1000
       4  1000				   add_roll
-      5  1000		       ad 44 10 	      lda	bonus
+      5  1000		       ad 6b 10 	      lda	bonus
       6  1003		       29 03		      and	#$03
       7  1005		       aa		      tax
       8  1006				   loop_score
-      9  1006		       20 17 10 	      jsr	add_score
+      9  1006		       20 3e 10 	      jsr	add_score
      10  1009		       ca		      dex
      11  100a		       d0 fa		      bne	loop_score
-     12  100c		       ad 45 10 	      lda	frame
+     12  100c		       ad 6c 10 	      lda	frame
      13  100f		       c9 10		      cmp	#$10
-     14  1011		       f0 03		      beq	end_score
-     15  1013		       20 17 10 	      jsr	add_score
-     16  1016				   end_score
-     17  1016		       60		      rts
-     18  1017				   add_score
-     19  1017		       18		      clc
-     20  1018		       ad 41 10 	      lda	roll
-     21  101b		       6d 42 10 	      adc	score
-     22  101e		       8d 42 10 	      sta	score
-     23  1021		       a9 00		      lda	#0
-     24  1023		       6d 43 10 	      adc	score+1
-     25  1026		       8d 43 10 	      sta	score+1
-     26  1029		       60		      rts
-     27  102a
-     28  102a				   start
-     29  102a		       a9 00		      lda	#0
-     30  102c		       8d 42 10 	      sta	score+0
-     31  102f		       8d 43 10 	      sta	score+1
-     32  1032		       8d 44 10 	      sta	bonus
-     33  1035		       8d 45 10 	      sta	frame
-     34  1038		       8d 41 10 	      sta	roll
-     35  103b		       a9 0b		      lda	#$0B
-     36  103d		       8d 46 10 	      sta	track
-     37  1040		       60		      rts
-     38  1041
-     39  1041		       00	   roll       .byte.b	0
-     40  1042		       00 00	   score      .word.w	0
-     41  1044		       00	   bonus      .byte.b	0
-     42  1045		       00	   frame      .byte.b	0
-     43  1046		       00	   track      .byte.b	0
-     44  1047
+     14  1011		       f0 03		      beq	add_done
+     15  1013		       20 3e 10 	      jsr	add_score
+     16  1016				   add_done
+     17  1016		       18		      clc
+     18  1017		       ad 6d 10 	      lda	track
+     19  101a		       6d 68 10 	      adc	roll
+     20  101d		       c9 15		      cmp	#$15
+     21  101f		       d0 06		      bne	not_strike
+     22  1021		       a9 03		      lda	#3
+     23  1023		       8d 6e 10 	      sta	type
+     24  1026		       60		      rts
+     25  1027				   not_strike
+     26  1027		       c9 0a		      cmp	#$0A
+     27  1029		       d0 05		      bne	not_spare
+     28  102b		       a9 02		      lda	#2
+     29  102d		       8d 6e 10 	      sta	type
+     30  1030				   not_spare
+     31  1030		       90 06		      bcc	not_second
+     32  1032		       a9 01		      lda	#1
+     33  1034		       8d 6e 10 	      sta	type
+     34  1037		       60		      rts
+     35  1038				   not_second
+     36  1038		       a9 00		      lda	#0
+     37  103a		       8d 6e 10 	      sta	type
+     38  103d		       60		      rts
+     39  103e				   add_score
+     40  103e		       18		      clc
+     41  103f		       ad 68 10 	      lda	roll
+     42  1042		       6d 69 10 	      adc	score
+     43  1045		       8d 69 10 	      sta	score
+     44  1048		       a9 00		      lda	#0
+     45  104a		       6d 6a 10 	      adc	score+1
+     46  104d		       8d 6a 10 	      sta	score+1
+     47  1050		       60		      rts
+     48  1051
+     49  1051				   start
+     50  1051		       a9 00		      lda	#0
+     51  1053		       8d 69 10 	      sta	score+0
+     52  1056		       8d 6a 10 	      sta	score+1
+     53  1059		       8d 6b 10 	      sta	bonus
+     54  105c		       8d 6c 10 	      sta	frame
+     55  105f		       8d 68 10 	      sta	roll
+     56  1062		       a9 0b		      lda	#$0B
+     57  1064		       8d 6d 10 	      sta	track
+     58  1067		       60		      rts
+     59  1068
+     60  1068		       00	   roll       .byte.b	0
+     61  1069		       00 00	   score      .word.w	0
+     62  106b		       00	   bonus      .byte.b	0
+     63  106c		       00	   frame      .byte.b	0
+     64  106d		       00	   track      .byte.b	0
+     65  106e		       00	   type       .byte.b	0
+     66  106f
