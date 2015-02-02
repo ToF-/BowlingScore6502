@@ -4,8 +4,11 @@
     .byte $34, $30, $39, $36, $00, $00
     .byte $00
     org $1000
+chrout equ $ffd2
 
-    jmp tests
+    lda #147
+    jsr chrout
+    jmp succeed
 add_roll
     lda bonus
     and #$03   
