@@ -1,0 +1,229 @@
+------- FILE tests.asm LEVEL 1 PASS 2
+      1  11be					      processor	6502
+      2  0801					      org	$0801
+      3  0801		       0c 08 0a 00*	      .byte.b	$0c, $08, $0a, $00, $9e, $20	; basic program: 10 sys 4096
+      4  0807		       34 30 39 36*	      .byte.b	$34, $30, $39, $36, $00, $00	; launches our code in $1000
+      5  080d		       00		      .byte.b	$00
+      6  1000					      org	$1000
+      7  1000		       d0 20	   border_color equ	$d020
+      8  1000		       d0 21	   screen_color equ	$d021
+      9  1000		       ff d2	   chrout     equ	$ffd2
+     10  1000
+     11  1000		       4c 92 10 	      jmp	test0
+------- FILE bowling.asm LEVEL 2 PASS 2
+      0  1003					      include	"bowling.asm"
+      1  1003
+      2  1003				   start_game		; initialize bonus, score, frame
+      3  1003		       a9 00		      lda	#0
+      4  1005		       8d 90 10 	      sta	bonus
+      5  1008		       8d 8c 10 	      sta	score
+      6  100b		       8d 8d 10 	      sta	score+1
+      7  100e		       8d 8e 10 	      sta	frame
+      8  1011		       a9 0b		      lda	#11	; 11 = new frame beginning
+      9  1013		       8d 8f 10 	      sta	track
+     10  1016		       60		      rts
+     11  1017
+     12  1017				   add_roll		; add a roll to the score
+     13  1017		       ad 90 10 	      lda	bonus
+     14  101a		       29 03		      and	#3	; bonus for this roll can be 2,1 or 0
+     15  101c		       aa		      tax
+     16  101d		       ad 90 10 	      lda	bonus	; shift bonus to next roll bonus (5->1)
+     17  1020		       4a		      lsr
+     18  1021		       4a		      lsr
+     19  1022		       8d 90 10 	      sta	bonus
+     20  1025		       8a		      txa		; bonus for this roll
+     21  1026		       f0 0a		      beq	add_normal	; if no bonus, just add the roll
+     22  1028		       aa		      tax
+     23  1029		       20 78 10 	      jsr	add_score	; add roll once more
+     24  102c		       ca		      dex
+     25  102d		       f0 03		      beq	add_normal
+     26  102f		       20 78 10 	      jsr	add_score	; add roll twice
+     27  1032				   add_normal
+     28  1032		       ad 8e 10 	      lda	frame
+     29  1035		       c9 0a		      cmp	#10	; if frame=10 don't add score
+     30  1037		       f0 03		      beq	end_add
+     31  1039		       20 78 10 	      jsr	add_score
+     32  103c				   end_add
+     33  103c		       ad 8e 10 	      lda	frame	; if frame=10 don't generate bonus
+     34  103f		       c9 0a		      cmp	#10
+     35  1041		       f0 25		      beq	keep_track	; keep always in the same frame
+     36  1043		       18		      clc		; calculating new bonus
+     37  1044		       ad 8f 10 	      lda	track
+     38  1047		       6d 8b 10 	      adc	roll
+     39  104a		       c9 15		      cmp	#21	; new frame+10 ==> strike
+     40  104c		       d0 0c		      bne	not_strike
+     41  104e		       18		      clc
+     42  104f		       ad 90 10 	      lda	bonus
+     43  1052		       69 05		      adc	#5	; next next roll bonus on bit 2, next roll bonus on bits 1 and 0
+     44  1054		       8d 90 10 	      sta	bonus
+     45  1057		       4c 6f 10 	      jmp	new_frame
+     46  105a				   not_strike
+     47  105a		       c9 0a		      cmp	#10	; track+roll= 10  ==> spare
+     48  105c		       d0 08		      bne	not_spare
+     49  105e		       a9 01		      lda	#1
+     50  1060		       8d 90 10 	      sta	bonus
+     51  1063		       4c 6f 10 	      jmp	new_frame
+     52  1066				   not_spare
+     53  1066		       90 07		      bcc	new_frame	; track + roll < 10 => new frame
+     54  1068				   keep_track		; 1st roll, keep track of roll
+     55  1068		       ad 8b 10 	      lda	roll
+     56  106b		       8d 8f 10 	      sta	track
+     57  106e		       60		      rts
+     58  106f				   new_frame		; mark new frame
+     59  106f		       a9 0b		      lda	#11
+     60  1071		       8d 8f 10 	      sta	track
+     61  1074		       ee 8e 10 	      inc	frame	; increase frame
+     62  1077		       60		      rts
+     63  1078				   add_score		; add roll to score
+     64  1078		       18		      clc
+     65  1079		       ad 8b 10 	      lda	roll
+     66  107c		       6d 8c 10 	      adc	score
+     67  107f		       8d 8c 10 	      sta	score
+     68  1082		       a9 00		      lda	#0
+     69  1084		       6d 8d 10 	      adc	score+1
+     70  1087		       8d 8d 10 	      sta	score+1
+     71  108a		       60		      rts
+     72  108b
+     73  108b		       00	   roll       .byte.b	0
+     74  108c		       00 00	   score      .word.w	0
+     75  108e		       00	   frame      .byte.b	0
+     76  108f		       00	   track      .byte.b	0
+     77  1090		       00	   bonus      .byte.b	0
+     78  1091		       00	   tmp	      .byte.b	0
+     79  1092
+------- FILE tests.asm
+     13  1092
+     14  1092				   test0		; after add_roll, score increases
+     15  1092		       a9 93		      lda	#147
+     16  1094		       20 d2 ff 	      jsr	chrout
+     17  1097		       20 03 10 	      jsr	start_game
+     18  109a		       a9 04		      lda	#4
+     19  109c		       8d 8b 10 	      sta	roll
+     20  109f		       20 17 10 	      jsr	add_roll
+     21  10a2		       20 17 10 	      jsr	add_roll
+     22  10a5		       ad 8c 10 	      lda	score
+     23  10a8		       c9 08		      cmp	#8
+     24  10aa		       f0 03		      beq	test1
+     25  10ac		       4c b8 11 	      jmp	fail
+     26  10af				   test1		; after 20 average rolls, adding roll doesn't increase score
+     27  10af		       a9 2e		      lda	#46
+     28  10b1		       20 d2 ff 	      jsr	chrout
+     29  10b4		       20 03 10 	      jsr	start_game
+     30  10b7		       a9 15		      lda	#21
+     31  10b9		       8d 91 10 	      sta	tmp
+     32  10bc				   test1loop
+     33  10bc		       a9 04		      lda	#4
+     34  10be		       8d 8b 10 	      sta	roll
+     35  10c1		       20 17 10 	      jsr	add_roll
+     36  10c4		       ce 91 10 	      dec	tmp
+     37  10c7		       d0 f3		      bne	test1loop
+     38  10c9		       ad 8c 10 	      lda	score
+     39  10cc		       c9 50		      cmp	#80
+     40  10ce		       f0 03		      beq	test2
+     41  10d0		       4c b8 11 	      jmp	fail
+     42  10d3				   test2		; a strike increases frame
+     43  10d3		       a9 2e		      lda	#46
+     44  10d5		       20 d2 ff 	      jsr	chrout
+     45  10d8		       20 03 10 	      jsr	start_game
+     46  10db		       a9 0a		      lda	#10
+     47  10dd		       8d 8b 10 	      sta	roll
+     48  10e0		       20 17 10 	      jsr	add_roll
+     49  10e3		       ad 8e 10 	      lda	frame
+     50  10e6		       c9 01		      cmp	#1
+     51  10e8		       f0 03		      beq	test3
+     52  10ea		       4c b8 11 	      jmp	fail
+     53  10ed				   test3		; a first roll doesn't increases frame
+     54  10ed		       a9 2e		      lda	#46
+     55  10ef		       20 d2 ff 	      jsr	chrout
+     56  10f2		       20 03 10 	      jsr	start_game
+     57  10f5		       a9 09		      lda	#9
+     58  10f7		       8d 8b 10 	      sta	roll
+     59  10fa		       20 17 10 	      jsr	add_roll
+     60  10fd		       ad 8e 10 	      lda	frame
+     61  1100		       c9 00		      cmp	#0
+     62  1102		       f0 03		      beq	test4
+     63  1104		       4c b8 11 	      jmp	fail
+     64  1107				   test4		; bonus rolls are added to score if there is bonus
+     65  1107		       a9 2e		      lda	#46
+     66  1109		       20 d2 ff 	      jsr	chrout
+     67  110c		       20 03 10 	      jsr	start_game
+     68  110f		       a9 02		      lda	#2
+     69  1111		       8d 90 10 	      sta	bonus
+     70  1114		       a9 04		      lda	#4
+     71  1116		       8d 8b 10 	      sta	roll
+     72  1119		       20 17 10 	      jsr	add_roll
+     73  111c		       ad 8c 10 	      lda	score
+     74  111f		       c9 0c		      cmp	#12
+     75  1121		       f0 03		      beq	test5
+     76  1123		       4c b8 11 	      jmp	fail
+     77  1126				   test5		; a strike creates a bonus of 1 for next roll and 1 for next next roll
+     78  1126		       a9 2e		      lda	#46
+     79  1128		       20 d2 ff 	      jsr	chrout
+     80  112b		       20 03 10 	      jsr	start_game
+     81  112e		       a9 0a		      lda	#10
+     82  1130		       8d 8b 10 	      sta	roll
+     83  1133		       20 17 10 	      jsr	add_roll
+     84  1136		       ad 90 10 	      lda	bonus
+     85  1139		       c9 05		      cmp	#5
+     86  113b		       f0 03		      beq	test6
+     87  113d		       4c b8 11 	      jmp	fail
+     88  1140				   test6		; a spare creates a bonus of 1 for next roll
+     89  1140		       a9 2e		      lda	#46
+     90  1142		       20 d2 ff 	      jsr	chrout
+     91  1145		       20 03 10 	      jsr	start_game
+     92  1148		       a9 05		      lda	#5
+     93  114a		       8d 8b 10 	      sta	roll
+     94  114d		       20 17 10 	      jsr	add_roll
+     95  1150		       a9 05		      lda	#5
+     96  1152		       8d 8b 10 	      sta	roll
+     97  1155		       20 17 10 	      jsr	add_roll
+     98  1158		       ad 90 10 	      lda	bonus
+     99  115b		       c9 01		      cmp	#1
+    100  115d		       f0 04		      beq	test7
+    101  115f		       4c b8 11 	      jmp	fail
+    102  1162		       60		      rts
+    103  1163				   test7		; a strike after a strike creates a bonus of 2 for next roll and 1 for next next roll
+    104  1163		       a9 2e		      lda	#46
+    105  1165		       20 d2 ff 	      jsr	chrout
+    106  1168		       20 03 10 	      jsr	start_game
+    107  116b		       a9 0a		      lda	#10
+    108  116d		       8d 8b 10 	      sta	roll
+    109  1170		       20 17 10 	      jsr	add_roll
+    110  1173		       a9 0a		      lda	#10
+    111  1175		       8d 8b 10 	      sta	roll
+    112  1178		       20 17 10 	      jsr	add_roll
+    113  117b		       ad 90 10 	      lda	bonus
+    114  117e		       c9 06		      cmp	#6
+    115  1180		       f0 03		      beq	test8
+    116  1182		       4c b8 11 	      jmp	fail
+    117  1185				   test8		; after 10 frames, strikes or spares don't create bonus
+    118  1185		       a9 2e		      lda	#46
+    119  1187		       20 d2 ff 	      jsr	chrout
+    120  118a		       20 03 10 	      jsr	start_game
+    121  118d		       a9 0c		      lda	#12
+    122  118f		       8d 91 10 	      sta	tmp
+    123  1192				   test8_loop
+    124  1192		       a9 0a		      lda	#10
+    125  1194		       8d 8b 10 	      sta	roll
+    126  1197		       20 17 10 	      jsr	add_roll
+    127  119a		       ce 91 10 	      dec	tmp
+    128  119d		       d0 f3		      bne	test8_loop
+    129  119f		       ad 8c 10 	      lda	score
+    130  11a2		       c9 2c		      cmp	#$2C
+    131  11a4		       d0 12		      bne	fail
+    132  11a6		       ad 8d 10 	      lda	score+1
+    133  11a9		       c9 01		      cmp	#$01
+    134  11ab		       d0 0b		      bne	fail
+    135  11ad		       a9 2e		      lda	#46
+    136  11af		       20 d2 ff 	      jsr	chrout
+    137  11b2
+    138  11b2				   succeed
+    139  11b2		       a9 05		      lda	#5
+    140  11b4		       8d 20 d0 	      sta	border_color
+    141  11b7		       60		      rts
+    142  11b8				   fail
+    143  11b8		       a9 02		      lda	#2
+    144  11ba		       8d 20 d0 	      sta	border_color
+    145  11bd		       60		      rts
+    146  11be
+    147  11be

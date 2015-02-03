@@ -1,2 +1,5 @@
-bowling:	bowling.asm
-	dasm bowling.asm -obowling.prg -sbowling.sym -v3 -T0
+bowling:	bowling.asm tests.asm
+	dasm tests.asm -otests.prg -stests.sym -ltests.lst -v3 -T0
+
+
+

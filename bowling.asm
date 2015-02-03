@@ -1,48 +1,66 @@
-    processor 6502
-    org $0801
-    .byte $0c, $08, $0a, $00, $9e, $20
-    .byte $34, $30, $39, $36, $00, $00
-    .byte $00
-    org $1000
 
-    jmp tests
-add_roll
+start_game      ; initialize bonus, score, frame
+    lda #0
+    sta bonus   
+    sta score
+    sta score+1
+    sta frame
+    lda #11     ; 11 = new frame beginning
+    sta track
+    rts
+
+add_roll        ; add a roll to the score
     lda bonus
-    and #$03   
-    tax 
-loop_score
+    and #3      ; bonus for this roll can be 2,1 or 0
+    tax
+    lda bonus   ; shift bonus to next roll bonus (5->1)
+    lsr
+    lsr
+    sta bonus   
+    txa             ; bonus for this roll
+    beq add_normal  ; if no bonus, just add the roll
+    tax
+    jsr add_score   ; add roll once more
+    dex     
+    beq add_normal
+    jsr add_score   ; add roll twice 
+add_normal
+    lda frame
+    cmp #10     ; if frame=10 don't add score
+    beq end_add
     jsr add_score
-    dex
-    bne loop_score 
-    lda frame   
-    cmp #$10    
-    beq add_done
-    jsr add_score
-add_done
-    clc
+end_add
+    lda frame   ; if frame=10 don't generate bonus
+    cmp #10
+    beq keep_track  ; keep always in the same frame
+    clc         ; calculating new bonus
     lda track
     adc roll
-    cmp #21     ;  11 + 10 = 10 roll on a new frame = strike
+    cmp #21     ; new frame+10 ==> strike
     bne not_strike
-    lda #3
-    sta type
-    rts
+    clc
+    lda bonus   
+    adc #5      ; next next roll bonus on bit 2, next roll bonus on bits 1 and 0
+    sta bonus
+    jmp new_frame
 not_strike
-    cmp #$0A    ; tr + ro = 10 it's a spare
+    cmp #10     ; track+roll= 10  ==> spare 
     bne not_spare
-    lda #2
-    sta type
-    rts
-not_spare
-    bcc not_second
     lda #1
-    sta type
+    sta bonus
+    jmp new_frame
+not_spare
+    bcc new_frame   ; track + roll < 10 => new frame
+keep_track          ; 1st roll, keep track of roll
+    lda roll
+    sta track
     rts
-not_second
-    lda #0
-    sta type
+new_frame           ; mark new frame
+    lda #11
+    sta track
+    inc frame       ; increase frame
     rts
-add_score
+add_score           ; add roll to score
     clc
     lda roll
     adc score
@@ -52,60 +70,10 @@ add_score
     sta score+1
     rts
 
-start
-    lda #0
-    sta score+0
-    sta score+1
-    sta bonus
-    sta frame
-    sta roll
-    lda #$0B
-    sta track
-    rts
-tests
-    lda #$0B
-    sta track
-    lda #$0A
-    sta roll
-    jsr add_roll
-    lda type
-    cmp #$03
-    bne fail
-    jsr succeed
-    
-    lda #$04
-    sta track
-    lda #$06
-    sta roll
-    jsr add_roll
-    lda type
-    cmp #$02
-    bne fail
-    jsr succeed
-    
-    lda #$0B
-    sta track
-    lda #$04
-    sta roll
-    jsr add_roll
-    lda type
-    cmp #$00
-    bne fail 
-    jsr succeed
-    rts
-succeed
-    lda #5
-    sta $d020
-    rts
-fail
-    lda #2
-    sta $d020
-    rts
+roll    .byte   0
+score   .word   0
+frame   .byte   0
+track   .byte   0
+bonus   .byte   0
+tmp     .byte   0
 
-roll    .byte 0
-score   .word 0
-bonus   .byte 0
-frame   .byte 0
-track   .byte 0
-type    .byte 0
-     
