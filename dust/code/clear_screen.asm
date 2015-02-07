@@ -1,12 +1,8 @@
 ;============================================================
-; Start coding here / delete example code
-;============================================================
-
-;============================================================
 ; clear screen and turn black
 ;============================================================
 
-init_screen      ldx #$00     ; start of loop
+clear_screen     ldx #$00     ; start of loop
                  stx $d020    ; write to border register
                  stx $d021    ; write to screen register
 clear            lda #$20     ; #$20 is the spacebar screencode

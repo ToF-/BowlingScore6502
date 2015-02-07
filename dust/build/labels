@@ -1,0 +1,11 @@
+loop_prompt	= $c049
+clear	= $c027
+main	= $c000	; unused
+end_prompt	= $c056	; ?
+end_get	= $c06d	; unused
+clear_screen	= $c01f	; ?
+prompt	= $c047	; ?
+x_entered	= $c06b	; ?
+prompt_line	= $c00a
+decode	= $c068	; ?
+get_roll	= $c057	; ?

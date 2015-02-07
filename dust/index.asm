@@ -1,3 +1,4 @@
+
 ;============================================================
 ; Empty Assembler project with Basic Loader
 ; Code by actraiser/Dustlayer
@@ -26,13 +27,9 @@
 !byte $31,$35,$32,$00,$00,$00           ; puts BASIC line 2012 SYS 49152
 * = $c000     				            ; start address for 6502 code
 
-;============================================================
-;  Main routine with IRQ setup and custom IRQ routine
-;============================================================
-
 !source "code/main.asm"
-
-;============================================================
-;  add additional source files as required
-;============================================================
+!source "code/static_text.asm"
+!source "code/clear_screen.asm"
+!source "code/prompt.asm"
+!source "code/get_roll.asm"
 
