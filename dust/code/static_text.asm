@@ -1,3 +1,3 @@
 
-prompt_line   !scr "enter roll: 0-9 or x"
+prompt_line   !text "ENTER ROLL: 0-9 OR X"
 			  !byte 0
