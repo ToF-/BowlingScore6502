@@ -32,4 +32,7 @@
 !source "code/clear_screen.asm"
 !source "code/prompt.asm"
 !source "code/get_roll.asm"
+!source "code/convert_bcd.asm"
+!source "code/print_bcd.asm"
+!source "code/print_score.asm"
 

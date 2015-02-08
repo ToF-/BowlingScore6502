@@ -7,6 +7,6 @@
 ;============================================================
 
 main            jsr clear_screen
-                jsr prompt
+                jsr print_score
                 jsr get_roll
                 rts
