@@ -1,5 +1,6 @@
 
-get_roll    jsr $FFCF
+get_roll    jsr prompt
+            jsr $FFCF
             cmp #$58
             beq x_entered
             cmp #$30

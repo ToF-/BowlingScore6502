@@ -17,4 +17,6 @@ clear            lda #$20     ; #$20 is the spacebar screencode
                  sta $dae8,x
                  inx         
                  bne clear   
+                 lda #147
+                 jsr $FFD2
                  rts 
