@@ -1,7 +1,10 @@
-emit	= $c035	; ?
-prnt_nibble	= $c02b	; ?
+emit	= $c03c	; ?
+fail	= $c04e	; ?
+assert_equals	= $c040	; ?
+result	= $c065	; ?
+prnt_nibble	= $c032	; ?
 bckgnd_col	= $d021
 chrout	= $ffd2
 border_col	= $d020
-print_a	= $c01c	; ?
-init_screen	= $c009	; ?
+print_a	= $c023
+init_screen	= $c010	; ?
