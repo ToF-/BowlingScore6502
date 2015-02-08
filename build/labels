@@ -1,3 +1,7 @@
+emit	= $c035	; ?
+prnt_nibble	= $c02b	; ?
 bckgnd_col	= $d021
 chrout	= $ffd2
 border_col	= $d020
+print_a	= $c01c	; ?
+init_screen	= $c009	; ?

@@ -9,3 +9,5 @@
 * = $c000     				            ; start address for 6502 code
 
 !source "code/main.asm"
+!source "code/init_screen.asm"
+!source "code/print_a.asm"
