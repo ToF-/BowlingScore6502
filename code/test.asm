@@ -1,6 +1,6 @@
 ; compare A and X (X = expected) if they are equals, print a .
 ; if they differ, print x then a 
-
+; DOESN'T WORK: X is lost during CHROUT
 assert_equals   sta result
                 cpx result
                 bne fail

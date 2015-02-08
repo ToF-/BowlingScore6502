@@ -12,3 +12,4 @@
 !source "code/init_screen.asm"
 !source "code/print_a.asm"
 !source "code/test.asm"
+!source "code/score_to_bcd.asm"
