@@ -13,3 +13,7 @@
 !source "code/print_a.asm"
 !source "code/test.asm"
 !source "code/score_to_bcd.asm"
+!source "code/score_to_txt.asm"
+!source "code/print_score.asm"
+!source "code/tests.asm"
+!source "code/add_roll.asm"
