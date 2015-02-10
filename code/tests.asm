@@ -1,3 +1,8 @@
+
+!macro      should_equal address {
+            lda address
+            jsr assert_equals }
+
 tests       ; when score = #$0107 then score_txt should be "263"
             lda #$07
             sta score+0
@@ -6,15 +11,12 @@ tests       ; when score = #$0107 then score_txt should be "263"
 
             jsr score_to_bcd
             jsr score_to_txt
-            lda score_txt+0
             ldx #$32
-            jsr assert_equals
-            lda score_txt+1
+            +should_equal score_txt+0
             ldx #$36
-            jsr assert_equals
-            lda score_txt+2
+            +should_equal score_txt+1
             ldx #$33
-            jsr assert_equals
+            +should_equal score_txt+2
 
             ; when add_roll 5 then score should increase by 5
             lda #$FE
@@ -24,11 +26,9 @@ tests       ; when score = #$0107 then score_txt should be "263"
             lda #5
             sta roll
             jsr add_roll
-            lda score+0
             ldx #$03
-            jsr assert_equals
-            lda score+1
+            +should_equal score+0
             ldx #$01
-            jsr assert_equals
+            +should_equal score+1
 
             rts

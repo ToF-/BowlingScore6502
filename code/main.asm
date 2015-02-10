@@ -1,6 +1,7 @@
 ; main.asm
             jsr init_screen
             jsr tests
+            jsr print_score
 
             rts
 
